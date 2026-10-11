@@ -1,197 +1,189 @@
 # Robot Fleet Black Box 🛡️🤖
-> **Sistem Pemantauan Armada Robot Logistik AGV & Verifikasi Integritas Log Forensik Kriptografi HMAC-SHA256**  
-> *Tugas Pengembangan Aplikasi Web (Milestone 1) — Kolaborasi Mata Kuliah Kriptografi dan Keamanan Komputasi dan Siber*
+
+> **Aplikasi Web Pemantauan Armada Robot Logistik AGV & Verifikasi Integritas Log Forensik Kriptografi HMAC-SHA256**  
+> *Tugas Pengembangan Aplikasi Web (Milestone 1)*
+
+![Lighthouse Accessibility Score: 93](docs/lighthouse-score.png)
 
 ---
 
-## 📋 Daftar Isi
-1. [Konsep Produk & Latar Belakang](#-1-konsep-produk--latar-belakang)
-2. [Pemetaan 9 Persyaratan Tugas (Milestone 1)](#-2-pemetaan-9-persyaratan-tugas-milestone-1)
-3. [Peran Pengguna & Model Hak Akses (RBAC)](#-3-peran-pengguna--model-hak-akses-rbac)
-4. [Arsitektur Kriptografi Hash Chain](#-4-arsitektur-kriptografi-hash-chain)
-5. [Fitur-Fitur Utama Aplikasi](#-5-fitur-fitur-utama-aplikasi)
-6. [Teknologi yang Digunakan](#-6-teknologi-yang-digunakan)
-7. [Struktur Folder Kode](#-7-struktur-folder-kode)
-8. [Petunjuk Menjalankan Proyek](#-8-petunjuk-menjalankan-proyek)
+## 📑 Daftar Isi
+1. [Konsep Produk](#-1-konsep-produk)
+2. [Fitur-Fitur Awal](#-2-fitur-fitur-awal)
+3. [Teknologi yang Digunakan](#-3-teknologi-yang-digunakan)
+4. [Struktur Aplikasi](#-4-struktur-aplikasi)
+5. [Hasil Pengujian Lighthouse (Skor 93)](#-5-hasil-pengujian-lighthouse-skor-93)
+6. [Petunjuk Menjalankan Proyek](#-6-petunjuk-menjalankan-proyek)
 
 ---
 
-## 🎯 1. Konsep Produk & Latar Belakang
+## 💡 1. Konsep Produk
 
-* **Nama Produk:** **Robot Fleet Black Box**
-* **Tujuan Produk:** Menyediakan antarmuka pemantauan armada robot otonom (*Automated Guided Vehicle* / AGV) di gudang logistik sekaligus menjadi modul penyelidikan forensik digital untuk memverifikasi keaslian dan mendeteksi manipulasi data log pergerakan saat terjadi insiden (tabrakan, deviasi jalur, *unauthorized stop*).
-* **Permasalahan yang Diselesaikan:** 
-  Pada operasional logistik otomatis, insiden robot sering kali diikuti oleh upaya peretas atau pihak tidak bertanggung jawab untuk mengubah data telemetri (misalnya menurunkan catatan kecepatan dari 1.9 m/s menjadi 0.5 m/s) demi menutupi kelalaian. Log biasa tanpa perlindungan kriptografi tidak memiliki nilai pembuktian forensik.
-* **Solusi Produk:** 
-  Aplikasi ini memanfaatkan mekanisme **Hash Chain HMAC-SHA256 (RFC 2104)** dengan *Genesis Block* 64 karakter nol dan *Server Checkpoint Head*. Setiap entri log terikat secara kriptografis dengan entri sebelumnya. Jika satu entri saja diubah, rantai hash terputus dan mesin verifikasi forensik akan secara instan mengidentifikasi nomor sekuens dan data yang dimanipulasi.
+### 📌 Latar Belakang & Permasalahan
+Pada fasilitas logistik otomatis modern, armada robot otonom (*Automated Guided Vehicle* / AGV) beroperasi secara dinamis mengangkut barang. Ketika terjadi insiden darurat—seperti tabrakan dengan muatan palet, deviasi jalur navigasi, atau penghentian tidak sah (*unauthorized stop*)—pihak forensik membutuhkan data rekaman pergerakan (*black box log*) untuk mengetahui kronologi sebenarnya.
 
----
+Namun, rekaman log biasa di database konvensional rentan dimanipulasi atau diubah (*tampered*) oleh pihak yang ingin menutupi pelanggaran operasional (contohnya memalsukan catatan kecepatan dari 1.9 m/s menjadi 0.5 m/s). Tanpa jaminan keaslian kriptografis, data log kehilangan kekuatan pembuktiannya.
 
-## ✅ 2. Pemetaan 9 Persyaratan Tugas (Milestone 1)
+### 🎯 Tujuan & Solusi
+**Robot Fleet Black Box** adalah solusi aplikasi web terpadu yang memadukan pemantauan armada logistik dengan pembuktian integritas log menggunakan modul kriptografi **Hash Chain HMAC-SHA256 (RFC 2104)**:
+* **Integritas Rantai Hash:** Setiap entri log terikat secara matematis dengan tanda tangan (*MAC*) dari entri sebelumnya (`prev_mac`).
+* **Genesis Block:** Entri pertama diinisialisasi dengan 64 karakter nol heksadesimal (`0000...0000`).
+* **Checkpoint Head:** Nilai MAC entri terakhir disimpan terpisah di server untuk mencegah serangan penghapusan/pemotongan log (*truncation attack*).
+* **Deteksi Seketika:** Jika peretas memodifikasi satu data saja pada masa lampau, seluruh rantai setelahnya akan rusak dan mesin forensik langsung menunjukkan titik manipulasi beserta perbandingan *Expected MAC* vs *Actual MAC*.
 
-| No | Persyaratan Rubrik | Implementasi pada Proyek | Status |
-|:--:|:---|:---|:--:|
-| **1** | **Menentukan konsep produk** | Nama, sasaran, tujuan, dan alur forensik robot AGV terdokumentasi sesuai SRS v0.1. | ✅ Terpenuhi |
-| **2** | **Mengembangkan antarmuka produk** | Dibangun dengan **React 18**, **TypeScript**, dan **Tailwind CSS** dengan arsitektur kode bersih dan terstruktur. | ✅ Terpenuhi |
-| **3** | **Membangun halaman aplikasi (min. 3)** | Dibuat **4 Halaman Aplikasi Utama**: <br>1. *Pemantauan Armada (Fleet Overview)*<br>2. *Black Box Log Explorer*<br>3. *Investigasi Insiden & Verifikasi Forensik*<br>4. *Pusat Administrasi & Audit Sistem* | ✅ Terpenuhi (4 Halaman) |
-| **4** | **Mengembangkan komponen reusable (min. 5)** | Dibuat **7 Komponen Modular**: <br>1. `Button` (primary, secondary, danger, outline, cyber, loading)<br>2. `Badge` (status indicator & pulsing live status)<br>3. `Modal` (accessible dialog with focus trap & ESC)<br>4. `FormField` (`Input`, `Select`, `Textarea` with error/a11y)<br>5. `Card` & `StatCard` (kpi metrics)<br>6. `Alert` (accessible semantic alerts)<br>7. `Tabs` (tablist navigation) | ✅ Terpenuhi (7 Komponen) |
-| **5** | **Mengimplementasikan formulir dengan validasi** | **3 Formulir Validasi Sisi Klien**: <br>1. Formulir Disposisi Perintah Robot (`CommandModal.tsx`)<br>2. Formulir Registrasi Insiden Baru (`NewIncidentModal.tsx`)<br>3. Formulir Pendaftaran Robot AGV (`RegisterRobotModal.tsx`) | ✅ Terpenuhi (3 Formulir) |
-| **6** | **Menggunakan mock data** | Mock data relasional terstruktur untuk 4 AGV, 24+ entri rantai hash log, berkas insiden forensik, dan jejak audit sistem. | ✅ Terpenuhi |
-| **7** | **Menerapkan desain responsif** | Responsif penuh pada layar ponsel ($\le$ 640px), tablet (768px), dan desktop ($\ge$ 1024px). | ✅ Terpenuhi |
-| **8** | **Menerapkan aksesibilitas web (A11y)** | Semantic HTML5 (`header`, `nav`, `main`, `footer`), ARIA labels & roles, kontras tinggi, keyboard navigation, focus indicators. Target Lighthouse $\ge$ 90+. | ✅ Terpenuhi |
-| **9** | **Menyusun dokumentasi produk** | README.md terperinci menjelaskan konsep, arsitektur, instalasi, dan panduan penggunaan sistem. | ✅ Terpenuhi |
+### 👥 Sasaran Pengguna & Peran (RBAC)
+Aplikasi mengimplementasikan *Role-Based Access Control* (RBAC) dengan 3 peran pengguna:
+1. **Operator Gudang:** Memantau kondisi armada (baterai, status, rute), melihat visual posisi robot di grid gudang, dan mengirim perintah operasional darurat (`STOP`, `RESUME`, `MOVE_TO`, `CHARGE`).
+2. **Penyelidik Forensik:** Mencatat berkas investigasi insiden, menjalankan verifikasi integritas rantai log HMAC-SHA256, menguji skenario pemalsuan data (*Tamper Simulator*), serta mencetak/mengunduh Berita Acara Forensik.
+3. **Administrator Sistem:** Mendaftarkan unit AGV baru, menetapkan kunci rahasia (*HMAC Pre-Shared Key*), dan memantau riwayat aktivitas pada tabel *Audit Trail*.
 
 ---
 
-## 👥 3. Peran Pengguna & Model Hak Akses (RBAC)
+## ✨ 2. Fitur-Fitur Awal
 
-Aplikasi menyediakan tombol *Switch Role* interaktif di bilah navigasi atas:
+### 1. Pemantauan Armada & Peta Grid Gudang 2D (`FleetOverviewPage`)
+* **Ringkasan KPI Armada:** Kartu metrik real-time untuk total robot terdaftar, unit aktif, status siaga/insiden, dan rata-rata daya baterai.
+* **Peta Tata Letak Gudang Interaktif (40m $\times$ 35m):** Memetakan posisi koordinat robot secara visual di Sektor A (Rak Penyimpanan), Sektor B (Loading Dock), Sektor C (Sorting), dan Sektor D (Charging Bays).
+* **Penyaringan & Pencarian:** Filter status armada (`ALL`, `ACTIVE`, `ALERT`, `CHARGING`, `IDLE`) serta bilah pencarian instan berdasarkan nama, ID, atau zona operasi.
+* **Disposisi Perintah Robot (`CommandModal`):** Formulir pengiriman perintah kontrol (`STOP`, `RESUME`, `MOVE_TO`, `CHARGE`) lengkap dengan validasi batas koordinat X (0–40m), Y (0–35m), dan alasan operasional.
 
-1. 👷‍♂️ **Operator Gudang:**
-   - Memantau kondisi armada (status, level baterai, koordinat real-time pada grid peta gudang 2D).
-   - Membuka log pergerakan robot.
-   - Mengirim perintah operasional/darurat: `STOP`, `RESUME`, `MOVE_TO`, `CHARGE`.
-2. 🕵️‍♂️ **Penyelidik Forensik:**
-   - Mencatat berkas investigasi insiden baru.
-   - Menjalankan mesin audit integritas kriptografi Hash Chain HMAC-SHA256 secara langsung di peramban.
-   - Menguji skenario manipulasi melalui *Tamper Simulator*.
-   - Mengunduh dan mencetak Berita Acara / Sertifikat Forensik Resmi (JSON & Print format).
-3. 🛡️ **Administrator Sistem:**
-   - Mendaftarkan unit robot AGV baru dengan pengaturan *HMAC Pre-Shared Key*.
-   - Mengelola parameter keamanan.
-   - Memantau riwayat aktivitas pengguna pada tabel *Audit Trail*.
+### 2. Penjelajah Log Black Box Rantai (`LogExplorerPage`)
+* **Diagram Alur Hash Chain (`HashChainVisualizer`):** Visualisasi rantai blok yang menghubungkan `Genesis` $\to$ `Entry #1` $\to \dots \to$ `Head Checkpoint`.
+* **Linimasa Log Rinci (`LogTimeline`):** Tabel entri log berantai dengan format `{seq, ts, prev_mac, payload, mac}`, indikator anomali sensor (peringatan LIDAR, benturan bumper), serta tombol salin hash instan.
+* **Simulator Manipulasi Log (`TamperSimulatorModal`):** Fitur demonstrasi untuk menguji sistem dengan cara memodifikasi nilai kecepatan/koordinat entri secara sengaja guna membuktikan kehandalan deteksi forensik.
 
----
+### 3. Investigasi Insiden & Verifikasi Forensik (`IncidentForensicsPage`)
+* **Pencatatan Insiden Baru (`NewIncidentModal`):** Formulir registrasi berkas kasus dengan validasi sisi klien (*required fields*, minimal karakter, kategori anomali, severity).
+* **Mesin Audit Kriptografi (`VerificationEngine`):** Mesin verifikasi langkah-demi-langkah yang menghitung ulang tanda tangan HMAC-SHA256 untuk setiap blok entri secara langsung di peramban pengguna.
+* **Sertifikat & Berita Acara Forensik (`VerificationReportModal`):** Dokumen bukti resmi hasil audit integritas yang siap dicetak (*print-ready layout*) atau diekspor ke berkas data JSON.
 
-## 🔐 4. Arsitektur Kriptografi Hash Chain
-
-Sesuai spesifikasi dokumen SRS (`crypto/blackbox_log.py`), setiap rekaman entri log black box memiliki struktur tuple:
-
-$$\text{Log Entry} = \{\text{seq}, \text{ts}, \text{prev\_mac}, \text{payload}, \text{mac}\}$$
-
-* **Genesis Block (Entri #1):**
-  Nilai `prev_mac` awal diisi oleh string 64-karakter nol heksadesimal:
-  `"0000000000000000000000000000000000000000000000000000000000000000"`
-* **Chaining Rule (Entri $i > 1$):**
-  $$\text{entry}[i].\text{prev\_mac} = \text{entry}[i-1].\text{mac}$$
-* **Otentikasi Kriptografis:**
-  $$\text{mac} = \text{HMAC-SHA256}(K, \text{canonical}(\text{seq}, \text{ts}, \text{prev\_mac}, \text{payload}))$$
-* **Head Checkpoint:**
-  Nilai MAC entri terakhir (*head*) dikirimkan secara terpisah ke server penyimpanan checkpoint. Jika seorang penyerang memotong (*truncate*) log terakhir, perbedaan head ini akan langsung memicu peringatan pemotongan log.
+### 4. Pusat Administrasi & Audit Sistem (`AdminManagementPage`)
+* **Registrasi Unit AGV Baru (`RegisterRobotModal`):** Formulir validasi format ID robot (regex `AGV-XX`), kapasitas angkut, zona gudang, dan kunci rahasia simetris HMAC.
+* **Audit Trail Log (`UserAuditTable`):** Rekaman jejak audit sistem yang mencatat waktu kejadian, pengguna, peran, jenis aksi, dan status eksekusi.
 
 ---
 
-## 🚀 5. Fitur-Fitur Utama Aplikasi
+## 🛠️ 3. Teknologi yang Digunakan
 
-1. **Warehouse Floor 2D Interactive Grid:**
-   Visualisasi tata letak gudang 40m $\times$ 35m (Sektor A: Rak, Sektor B: Loading Dock, Sektor C: Sorting, Sektor D: Charging) yang memetakan posisi armada secara dinamis.
-2. **Visual Hash Chain Diagram:**
-   Visualisasi interaktif blok-blok log dan panah penghubung tanda tangan kriptografi.
-3. **Simulasi Serangan / Tamper Simulator:**
-   Memungkinkan penguji mengubah kecepatan atau koordinat robot secara sengaja untuk membuktikan ketangguhan deteksi mesin forensik.
-4. **Live Verification Engine:**
-   Animasi multi-tahap verifikasi hash chain HMAC-SHA256 dengan deteksi mismatch otomatis.
-5. **Printable Forensic Certificate:**
-   Format berita acara pemeriksaan digital yang dapat dicetak atau diekspor ke format JSON bukti sidang/audit.
-6. **Formulir Validasi Ketat:**
-   Pencegahan input tidak valid pada pengiriman perintah (koordinat target), pendaftaran unit robot (format regex `AGV-XX`), dan pencatatan insiden.
+* **Frontend Framework:** [React 18.3](https://react.dev/) (Komponen fungsional dengan Hooks)
+* **Bahasa:** [TypeScript 5.7](https://www.typescriptlang.org/) (Strict type checking)
+* **Styling & Desain:** [Tailwind CSS 3.4](https://tailwindcss.com/) (Utility-first CSS, responsive design, dark mode theme)
+* **Ikonografi:** [Lucide React](https://lucide.dev/) (Modern industrial & cyber security icons)
+* **Build Tool & Bundler:** [Vite 6.1](https://vitejs.dev/) (Hot Module Replacement super cepat)
+* **Mesin Kriptografi:** Web Crypto API (`window.crypto.subtle`) dengan fallback HMAC-SHA256 mandiri
 
 ---
 
-## 💻 6. Teknologi yang Digunakan
-
-* **Frontend Framework:** React 18.3
-* **Bahasa:** TypeScript 5.7 (Strict Mode)
-* **Styling:** Tailwind CSS 3.4
-* **Ikon:** Lucide React
-* **Build Tool:** Vite 6.1
-* **Engine Kriptografi:** Web Crypto API (`window.crypto.subtle`) dengan fallback HMAC-SHA256 murni
-
----
-
-## 📁 7. Struktur Folder Kode
+## 📂 4. Struktur Aplikasi
 
 ```text
 web-pemweb/
-├── public/
+├── docs/
+│   └── lighthouse-score.png           # Bukti screenshot audit Lighthouse (Skor 93)
+├── public/                            # Aset statis & favicon
 ├── src/
 │   ├── components/
 │   │   ├── admin/
-│   │   │   ├── RegisterRobotModal.tsx       # Form registrasi AGV
-│   │   │   └── UserAuditTable.tsx           # Tabel audit trail
-│   │   ├── common/                          # 7 Komponen Reusable
-│   │   │   ├── Alert.tsx
-│   │   │   ├── Badge.tsx
-│   │   │   ├── Button.tsx
-│   │   │   ├── Card.tsx
-│   │   │   ├── FormField.tsx
-│   │   │   ├── Modal.tsx
-│   │   │   └── Tabs.tsx
+│   │   │   ├── RegisterRobotModal.tsx # Formulir pendaftaran unit AGV baru
+│   │   │   └── UserAuditTable.tsx     # Tabel audit trail aktivitas sistem
+│   │   ├── common/                    # 7 Komponen UI Reusable
+│   │   │   ├── Alert.tsx              # Notifikasi peringatan/sukses accessible
+│   │   │   ├── Badge.tsx              # Lencana status dengan animasi pulse
+│   │   │   ├── Button.tsx             # Tombol serbaguna (variants, loading, icons)
+│   │   │   ├── Card.tsx               # Kontainer kartu & StatCard KPI
+│   │   │   ├── FormField.tsx          # Wrapper Input, Select, Textarea & validasi
+│   │   │   ├── Modal.tsx              # Dialog modal accessible (ARIA & Escape key)
+│   │   │   └── Tabs.tsx               # Navigasi tablist
 │   │   ├── fleet/
-│   │   │   ├── CommandModal.tsx             # Form disposisi instruksi AGV
-│   │   │   ├── RobotCard.tsx                # Kartu status AGV
-│   │   │   └── WarehouseMap.tsx             # Peta 2D gudang interaktif
+│   │   │   ├── CommandModal.tsx       # Formulir instruksi kendali robot
+│   │   │   ├── RobotCard.tsx          # Kartu ringkasan unit AGV
+│   │   │   └── WarehouseMap.tsx       # Visualisasi peta grid 2D tata letak gudang
 │   │   ├── forensics/
-│   │   │   ├── IncidentList.tsx             # Daftar kasus insiden
-│   │   │   ├── NewIncidentModal.tsx         # Form pelaporan insiden baru
-│   │   │   ├── VerificationEngine.tsx       # Mesin verifikasi kriptografi
-│   │   │   └── VerificationReportModal.tsx  # Laporan berita acara forensik
+│   │   │   ├── IncidentList.tsx       # Daftar berkas kasus insiden
+│   │   │   ├── NewIncidentModal.tsx   # Formulir pelaporan kasus insiden baru
+│   │   │   ├── VerificationEngine.tsx # Mesin komputasi audit HMAC-SHA256
+│   │   │   └── VerificationReportModal.tsx # Sertifikat berita acara forensik
 │   │   ├── layout/
-│   │   │   ├── Footer.tsx
-│   │   │   ├── Navbar.tsx
-│   │   │   └── RoleBanner.tsx               # Switcher RBAC
+│   │   │   ├── Footer.tsx             # Bilah kaki aplikasi
+│   │   │   ├── Navbar.tsx             # Navigasi utama & menu drawer mobile
+│   │   │   └── RoleBanner.tsx         # Bilah pengalih peran pengguna (RBAC)
 │   │   └── logs/
-│   │       ├── HashChainVisualizer.tsx      # Diagram alur rantai hash
-│   │       ├── LogTimeline.tsx              # Linimasa tabel log
-│   │       └── TamperSimulatorModal.tsx     # Simulator manipulasi data
+│   │       ├── HashChainVisualizer.tsx# Visualisasi blok rantai hash berurutan
+│   │       ├── LogTimeline.tsx        # Tabel linimasa entri log berantai
+│   │       └── TamperSimulatorModal.tsx# Modal simulasi modifikasi log ilegal
 │   ├── data/
-│   │   └── mockData.ts                      # Mock dataset relasional
-│   ├── pages/
-│   │   ├── AdminManagementPage.tsx          # Halaman Admin
-│   │   ├── FleetOverviewPage.tsx            # Halaman Monitoring Armada
-│   │   ├── IncidentForensicsPage.tsx        # Halaman Forensik Insiden
-│   │   └── LogExplorerPage.tsx              # Halaman Explorer Log
+│   │   └── mockData.ts                # Dataset tiruan AGV, rantai log, dan insiden
+│   ├── pages/                         # 4 Halaman Aplikasi Utama
+│   │   ├── AdminManagementPage.tsx    # Halaman Pusat Administrasi & Audit
+│   │   ├── FleetOverviewPage.tsx      # Halaman Pemantauan Armada AGV
+│   │   ├── IncidentForensicsPage.tsx  # Halaman Investigasi Insiden Forensik
+│   │   └── LogExplorerPage.tsx        # Halaman Penjelajah Log Black Box
 │   ├── types/
-│   │   └── index.ts                         # Interface & Domain Types
+│   │   └── index.ts                   # Definisi tipe data & antarmuka domain
 │   ├── utils/
-│   │   └── crypto.ts                        # Implementasi HMAC-SHA256 & Verifier
-│   ├── App.tsx                              # Root App Component
-│   ├── index.css                            # Global CSS & Print Media Styles
-│   └── main.tsx                             # Entry point React
-├── index.html                               # Accessible HTML5 template
-├── package.json
-├── tailwind.config.js
-├── tsconfig.json
-└── vite.config.ts
+│   │   └── crypto.ts                  # Algoritma HMAC-SHA256 & verifikator rantai
+│   ├── App.tsx                        # Root component & pengelola state global
+│   ├── index.css                      # Konfigurasi Tailwind & print media styles
+│   └── main.tsx                       # Titik masuk React DOM
+├── index.html                         # Template HTML5 semantik & metadata
+├── package.json                       # Konfigurasi dependensi dan skrip
+├── tailwind.config.js                 # Konfigurasi tema warna Tailwind
+├── tsconfig.json                      # Konfigurasi kompilator TypeScript
+└── vite.config.ts                     # Konfigurasi bundler Vite
 ```
 
 ---
 
-## ⚡ 8. Petunjuk Menjalankan Proyek
+## 📊 5. Hasil Pengujian Lighthouse (Skor 93)
 
-### Prasyarat
-* Node.js versi 18+ (disarankan Node.js 20 atau 24)
-* npm versi 9+
+Pengujian aksesibilitas (*Web Accessibility Audit*) dilakukan langsung pada lingkungan pengujian lokal (`http://localhost:5173/`) menggunakan Google Chrome Lighthouse:
 
-### Langkah Menjalankan:
-1. Buka terminal pada folder proyek:
+| Metrik Audit | Nilai Pengujian | Standar Minimum Tugas | Status Evaluasi |
+|:---|:---:|:---:|:---:|
+| **Accessibility Score** | <span style="color:#10b981; font-weight:bold; font-size:1.1em;">93 / 100</span> | Minimal 85 | ✅ **Lulus Unggul (+8 poin di atas batas)** |
+| **Passed Audits** | **16 Audit Lolos** | - | ✅ Terpenuhi |
+| **Not Applicable** | **45 Kategori** | - | ✅ Terpenuhi |
+
+![Hasil Audit Lighthouse Accessibility: Skor 93](docs/lighthouse-score.png)
+
+### Rincian Prinsip Aksesibilitas yang Diterapkan:
+1. **HTML Semantik:** Penggunaan tag `<header>`, `<nav>`, `<main>`, `<footer>`, `<section>`, dan heading berjenjang untuk mempermudah pembaca layar (*screen reader*).
+2. **Accessible Dialog & Form Controls:** Setiap modal dilengkapi `role="dialog"`, `aria-modal="true"`, serta penutup tombol dengan tombol `Escape`. Semua input formulir memiliki asosiasi eksplisit antara `label[htmlFor]` dengan `input[id]`, serta keterangan validasi `aria-invalid` dan `aria-describedby`.
+3. **Keyboard Navigation & Skip Link:** Dilengkapi tautan navigasi langsung (*Skip to main content*) untuk pengguna keyboard, serta *focus rings* (`focus-visible:ring-cyan-500`) yang jelas di seluruh kontrol interaktif.
+4. **Desain Kontras Tinggi:** Rasio kontras teks terang terhadap latar belakang gelap (*cyber industrial slate*) dirancang agar mudah dibaca di berbagai pencahayaan.
+
+---
+
+## ⚡ 6. Petunjuk Menjalankan Proyek
+
+### Prasyarat Sistem
+* [Node.js](https://nodejs.org/) versi 18 ke atas (disarankan versi LTS: Node.js 20 atau Node.js 22+)
+* [npm](https://www.npmjs.com/) versi 9 ke atas
+
+### Langkah-Langkah Instalasi & Eksekusi:
+
+1. **Buka Terminal / PowerShell** pada direktori proyek:
    ```bash
    cd "web-pemweb"
    ```
-2. Pasang pustaka dependensi (jika belum):
+
+2. **Pasang dependensi pustaka:**
    ```bash
    npm install
    ```
-3. Jalankan server pengembangan lokal:
+
+3. **Jalankan server pengembangan (Dev Server):**
    ```bash
    npm run dev
    ```
-4. Buka peramban pada alamat lokal yang tertera:
-   `http://localhost:5173/`
 
-### Membangun Versi Produksi:
+4. **Buka aplikasi di peramban:**  
+   Buka URL lokal yang ditampilkan di terminal:
+   👉 **`http://localhost:5173/`**
+
+### Perintah Pembangunan Versi Produksi:
+Untuk menguji proses kompilasi TypeScript dan pembuatan berkas *production bundle*:
 ```bash
 npm run build
 npm run preview
 ```
-
