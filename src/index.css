@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 min-h-screen font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Accessible focus indicators */
+  :focus-visible {
+    @apply outline-none ring-2 ring-cyan-500 ring-offset-2 ring-offset-slate-950;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Print styling for forensic reports */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #forensic-report-content,
+  #forensic-report-content * {
+    visibility: visible;
+  }
+  #forensic-report-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background-color: white !important;
+    color: black !important;
+    border: none !important;
+  }
+  #forensic-report-content span,
+  #forensic-report-content p,
+  #forensic-report-content strong,
+  #forensic-report-content h2,
+  #forensic-report-content h4 {
+    color: black !important;
+  }
+}
+
