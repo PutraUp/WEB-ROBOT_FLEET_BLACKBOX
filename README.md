@@ -65,16 +65,19 @@ Aplikasi mengimplementasikan *Role-Based Access Control* (RBAC) dengan 3 peran p
 
 ## 🛠️ 3. Teknologi yang Digunakan
 
-* **Frontend Framework:** [React 18.3](https://react.dev/) (Komponen fungsional dengan Hooks)
+* **Framework:** [Next.js 15 (App Router)](https://nextjs.org/) (Hybrid Server & Client Components)
+* **Frontend Library:** [React 18.3](https://react.dev/) (Functional Components, Hooks, Error Boundaries)
 * **Bahasa:** [TypeScript 5.7](https://www.typescriptlang.org/) (Strict type checking)
-* **Styling & Desain:** [Tailwind CSS 3.4](https://tailwindcss.com/) (Utility-first CSS, responsive design, dark mode theme)
-* **Ikonografi:** [Lucide React](https://lucide.dev/) (Modern industrial & cyber security icons)
-* **Build Tool & Bundler:** [Vite 6.1](https://vitejs.dev/) (Hot Module Replacement super cepat)
-* **Mesin Kriptografi:** Web Crypto API (`window.crypto.subtle`) dengan fallback HMAC-SHA256 mandiri
+* **Styling & Desain:** [Tailwind CSS 3.4](https://tailwindcss.com/) (Utility-first CSS, dark industrial cyber theme)
+* **Ikonografi:** [Lucide React](https://lucide.dev/) (Cyber security & industrial icons)
+* **Keamanan Data:** `server-only` (Mencegah kebocoran kunci HMAC dan data sensitif ke bundle browser)
+* **Mesin Kriptografi:** Web Crypto API (`window.crypto.subtle`) dengan fallback HMAC-SHA256 (RFC 2104)
 
 ---
 
-## 📂 4. Struktur Aplikasi
+## 📂 4. Struktur Aplikasi (Next.js 15 App Router & Modul 4)
+
+Implementasi mematuhi standar **Modul 4 Praktikum Pengembangan Aplikasi Web (2026)**:
 
 ```text
 web-pemweb/
@@ -82,61 +85,51 @@ web-pemweb/
 │   └── lighthouse-score.png           # Bukti screenshot audit Lighthouse (Skor 93)
 ├── public/                            # Aset statis & favicon
 ├── src/
-│   ├── components/
-│   │   ├── admin/
-│   │   │   ├── RegisterRobotModal.tsx # Formulir pendaftaran unit AGV baru
-│   │   │   └── UserAuditTable.tsx     # Tabel audit trail aktivitas sistem
-│   │   ├── common/                    # 7 Komponen UI Reusable
-│   │   │   ├── Alert.tsx              # Notifikasi peringatan/sukses accessible
-│   │   │   ├── Badge.tsx              # Lencana status dengan animasi pulse
-│   │   │   ├── Button.tsx             # Tombol serbaguna (variants, loading, icons)
-│   │   │   ├── Card.tsx               # Kontainer kartu & StatCard KPI
-│   │   │   ├── FormField.tsx          # Wrapper Input, Select, Textarea & validasi
-│   │   │   ├── Modal.tsx              # Dialog modal accessible (ARIA & Escape key)
-│   │   │   └── Tabs.tsx               # Navigasi tablist
-│   │   ├── fleet/
-│   │   │   ├── CommandModal.tsx       # Formulir instruksi kendali robot
-│   │   │   ├── RobotCard.tsx          # Kartu ringkasan unit AGV
-│   │   │   └── WarehouseMap.tsx       # Visualisasi peta grid 2D tata letak gudang
-│   │   ├── forensics/
-│   │   │   ├── IncidentList.tsx       # Daftar berkas kasus insiden
-│   │   │   ├── NewIncidentModal.tsx   # Formulir pelaporan kasus insiden baru
-│   │   │   ├── VerificationEngine.tsx # Mesin komputasi audit HMAC-SHA256
-│   │   │   └── VerificationReportModal.tsx # Sertifikat berita acara forensik
-│   │   ├── layout/
-│   │   │   ├── Footer.tsx             # Bilah kaki aplikasi
-│   │   │   ├── Navbar.tsx             # Navigasi utama & menu drawer mobile
-│   │   │   └── RoleBanner.tsx         # Bilah pengalih peran pengguna (RBAC)
-│   │   └── logs/
-│   │       ├── HashChainVisualizer.tsx# Visualisasi blok rantai hash berurutan
-│   │       ├── LogTimeline.tsx        # Tabel linimasa entri log berantai
-│   │       └── TamperSimulatorModal.tsx# Modal simulasi modifikasi log ilegal
-│   ├── data/
-│   │   └── mockData.ts                # Dataset tiruan AGV, rantai log, dan insiden
-│   ├── pages/                         # 4 Halaman Aplikasi Utama
-│   │   ├── AdminManagementPage.tsx    # Halaman Pusat Administrasi & Audit
-│   │   ├── FleetOverviewPage.tsx      # Halaman Pemantauan Armada AGV
-│   │   ├── IncidentForensicsPage.tsx  # Halaman Investigasi Insiden Forensik
-│   │   └── LogExplorerPage.tsx        # Halaman Penjelajah Log Black Box
+│   ├── app/                           # File-based Routing (App Router)
+│   │   ├── layout.tsx                 # Root layout bersama yang dipertahankan antar halaman
+│   │   ├── loading.tsx                # Global loading state (React Suspense)
+│   │   ├── error.tsx                  # Global error boundary (Client Component)
+│   │   ├── not-found.tsx              # Halaman 404 global
+│   │   ├── page.tsx                   # Rute Beranda (/)
+│   │   ├── katalog/                   # Rute Segmen Katalog (/katalog)
+│   │   │   ├── page.tsx               # Server Component Katalog Robot AGV
+│   │   │   ├── template.tsx           # State remounting behavior test per navigasi
+│   │   │   ├── loading.tsx            # Loading indicator katalog
+│   │   │   ├── error.tsx              # Error boundary katalog (Client Component)
+│   │   │   └── [id]/                  # Rute Dinamis (/katalog/[id])
+│   │   │       ├── page.tsx           # Detail robot (params: Promise<{id}>, generateStaticParams, regex validation)
+│   │   │       ├── loading.tsx        # Loading detail robot
+│   │   │       └── not-found.tsx      # Tampilan khusus saat unit ID tidak ditemukan
+│   │   ├── tentang/                   # Rute Tentang (/tentang)
+│   │   │   └── page.tsx               # Server Component murni profil sistem & spesifikasi
+│   │   ├── logs/                      # Rute Penjelajah Log (/logs)
+│   │   ├── forensics/                 # Rute Investigasi Forensik (/forensics)
+│   │   └── admin/                     # Rute Admin & Audit (/admin)
+│   ├── components/                    # Komponen Antarmuka Terstruktur
+│   │   ├── admin/                     # Modal registrasi & tabel audit trail
+│   │   ├── common/                    # Komponen reusable (Alert, Badge, Button, Card, Modal, Tabs)
+│   │   ├── fleet/                     # Warehouse map, RobotCard, CommandModal
+│   │   ├── forensics/                 # Mesin verifikasi HMAC, incident list & report
+│   │   ├── layout/                    # AppShell, Navbar, Footer, RoleBanner
+│   │   └── logs/                      # Log timeline, hash chain visualizer, tamper modal
+│   ├── lib/
+│   │   └── data.ts                    # Modul data server-only (dilindungi dari client bundle)
+│   ├── context/
+│   │   └── FleetContext.tsx           # State management armada & RBAC
 │   ├── types/
-│   │   └── index.ts                   # Definisi tipe data & antarmuka domain
-│   ├── utils/
-│   │   └── crypto.ts                  # Algoritma HMAC-SHA256 & verifikator rantai
-│   ├── App.tsx                        # Root component & pengelola state global
-│   ├── index.css                      # Konfigurasi Tailwind & print media styles
-│   └── main.tsx                       # Titik masuk React DOM
-├── index.html                         # Template HTML5 semantik & metadata
-├── package.json                       # Konfigurasi dependensi dan skrip
-├── tailwind.config.js                 # Konfigurasi tema warna Tailwind
-├── tsconfig.json                      # Konfigurasi kompilator TypeScript
-└── vite.config.ts                     # Konfigurasi bundler Vite
+│   │   └── index.ts                   # Definisi tipe domain
+│   └── utils/
+│       └── crypto.ts                  # Algoritma HMAC-SHA256 & verifikator rantai
+├── .eslintrc.json                     # Konfigurasi ESLint (Next.js core-web-vitals)
+├── next.config.mjs                    # Konfigurasi Next.js 15
+└── package.json                       # Dependensi proyek
 ```
 
 ---
 
 ## 📊 5. Hasil Pengujian Lighthouse (Skor 93)
 
-Pengujian aksesibilitas (*Web Accessibility Audit*) dilakukan langsung pada lingkungan pengujian lokal (`http://localhost:5173/`) menggunakan Google Chrome Lighthouse:
+Pengujian aksesibilitas (*Web Accessibility Audit*) dilakukan langsung pada lingkungan pengujian lokal menggunakan Google Chrome Lighthouse:
 
 | Metrik Audit | Nilai Pengujian | Standar Minimum Tugas | Status Evaluasi |
 |:---|:---:|:---:|:---:|
@@ -144,46 +137,32 @@ Pengujian aksesibilitas (*Web Accessibility Audit*) dilakukan langsung pada ling
 | **Passed Audits** | **16 Audit Lolos** | - | ✅ Terpenuhi |
 | **Not Applicable** | **45 Kategori** | - | ✅ Terpenuhi |
 
-![Hasil Audit Lighthouse Accessibility: Skor 93](docs/lighthouse-score.png)
-
-### Rincian Prinsip Aksesibilitas yang Diterapkan:
-1. **HTML Semantik:** Penggunaan tag `<header>`, `<nav>`, `<main>`, `<footer>`, `<section>`, dan heading berjenjang untuk mempermudah pembaca layar (*screen reader*).
-2. **Accessible Dialog & Form Controls:** Setiap modal dilengkapi `role="dialog"`, `aria-modal="true"`, serta penutup tombol dengan tombol `Escape`. Semua input formulir memiliki asosiasi eksplisit antara `label[htmlFor]` dengan `input[id]`, serta keterangan validasi `aria-invalid` dan `aria-describedby`.
-3. **Keyboard Navigation & Skip Link:** Dilengkapi tautan navigasi langsung (*Skip to main content*) untuk pengguna keyboard, serta *focus rings* (`focus-visible:ring-cyan-500`) yang jelas di seluruh kontrol interaktif.
-4. **Desain Kontras Tinggi:** Rasio kontras teks terang terhadap latar belakang gelap (*cyber industrial slate*) dirancang agar mudah dibaca di berbagai pencahayaan.
-
 ---
 
 ## ⚡ 6. Petunjuk Menjalankan Proyek
 
 ### Prasyarat Sistem
-* [Node.js](https://nodejs.org/) versi 18 ke atas (disarankan versi LTS: Node.js 20 atau Node.js 22+)
-* [npm](https://www.npmjs.com/) versi 9 ke atas
+* [Node.js](https://nodejs.org/) versi 18.18+ atau versi 20+
+* [npm](https://www.npmjs.com/) versi 9+
 
-### Langkah-Langkah Instalasi & Eksekusi:
+### Langkah-Langkah Menjalankan:
 
-1. **Buka Terminal / PowerShell** pada direktori proyek:
-   ```bash
-   cd "web-pemweb"
-   ```
-
-2. **Pasang dependensi pustaka:**
-   ```bash
-   npm install
-   ```
-
-3. **Jalankan server pengembangan (Dev Server):**
+1. **Jalankan server pengembangan (Dev Server):**
    ```bash
    npm run dev
    ```
 
-4. **Buka aplikasi di peramban:**  
-   Buka URL lokal yang ditampilkan di terminal:
-   👉 **`http://localhost:5173/`**
+2. **Buka aplikasi di peramban:**  
+   Buka URL lokal:
+   👉 **`http://localhost:3000/`**
 
-### Perintah Pembangunan Versi Produksi:
-Untuk menguji proses kompilasi TypeScript dan pembuatan berkas *production bundle*:
-```bash
-npm run build
-npm run preview
-```
+3. **Verifikasi ESLint & Validasi Kode:**
+   ```bash
+   npm run lint
+   ```
+
+4. **Kompilasi Versi Produksi (Build):**
+   ```bash
+   npm run build
+   npm run start
+   ```

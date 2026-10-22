@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ShieldCheck, Lock, ExternalLink } from 'lucide-react';
 
 export const Footer: React.FC = () => {
@@ -32,12 +33,22 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
-          <p>&copy; 2026 Robot Fleet Black Box. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            <span>RFC 2104 (HMAC-SHA256)</span>
-            <ExternalLink className="w-3 h-3 text-slate-500" aria-hidden="true" />
-          </p>
+        {/* Quick Nav Links */}
+        <div className="mt-6 pt-4 border-t border-slate-900 flex flex-wrap items-center justify-between gap-3 text-[11px]">
+          <nav className="flex flex-wrap items-center gap-4" aria-label="Tautan Bawah">
+            <Link href="/" className="hover:text-cyan-400 transition-colors">Beranda</Link>
+            <Link href="/katalog" className="hover:text-cyan-400 transition-colors">Katalog Robot</Link>
+            <Link href="/logs" className="hover:text-cyan-400 transition-colors">Black Box Logs</Link>
+            <Link href="/forensics" className="hover:text-cyan-400 transition-colors">Investigasi Forensik</Link>
+            <Link href="/tentang" className="hover:text-cyan-400 transition-colors">Tentang Sistem</Link>
+          </nav>
+          <div className="flex items-center gap-4 text-slate-500">
+            <p>&copy; 2026 Robot Fleet Black Box. All rights reserved.</p>
+            <p className="flex items-center gap-1">
+              <span>RFC 2104 (HMAC-SHA256)</span>
+              <ExternalLink className="w-3 h-3 text-slate-500" aria-hidden="true" />
+            </p>
+          </div>
         </div>
       </div>
     </footer>

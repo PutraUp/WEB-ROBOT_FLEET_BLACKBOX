@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { AGVRobot, AuditLog } from '../types';
 import { UserAuditTable } from '../components/admin/UserAuditTable';

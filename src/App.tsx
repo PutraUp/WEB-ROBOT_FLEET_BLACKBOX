@@ -4,10 +4,10 @@ import { INITIAL_ROBOTS, INITIAL_LOGS_MAP, INITIAL_INCIDENTS, INITIAL_AUDIT_LOGS
 import { Navbar } from './components/layout/Navbar';
 import { RoleBanner } from './components/layout/RoleBanner';
 import { Footer } from './components/layout/Footer';
-import { FleetOverviewPage } from './pages/FleetOverviewPage';
-import { LogExplorerPage } from './pages/LogExplorerPage';
-import { IncidentForensicsPage } from './pages/IncidentForensicsPage';
-import { AdminManagementPage } from './pages/AdminManagementPage';
+import { FleetOverviewPage } from './views/FleetOverviewPage';
+import { LogExplorerPage } from './views/LogExplorerPage';
+import { IncidentForensicsPage } from './views/IncidentForensicsPage';
+import { AdminManagementPage } from './views/AdminManagementPage';
 import { RegisterRobotModal } from './components/admin/RegisterRobotModal';
 
 export const App: React.FC = () => {

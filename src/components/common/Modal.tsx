@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+'use client';
+
+import React, { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 
 export interface ModalProps {
@@ -21,8 +23,9 @@ export const Modal: React.FC<ModalProps> = ({
   maxWidth = 'lg'
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const titleId = `modal-title-${Math.random().toString(36).substring(2, 9)}`;
-  const descId = `modal-desc-${Math.random().toString(36).substring(2, 9)}`;
+  const uniqueId = useId();
+  const titleId = `modal-title-${uniqueId}`;
+  const descId = `modal-desc-${uniqueId}`;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

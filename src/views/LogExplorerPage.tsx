@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { AGVRobot, BlackBoxLogEntry } from '../types';
 import { HashChainVisualizer } from '../components/logs/HashChainVisualizer';

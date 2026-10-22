@@ -18,14 +18,18 @@ export async function computeHmacSha256(keyHex: string, message: string): Promis
   try {
     const encoder = new TextEncoder();
     const keyData = encoder.encode(keyHex);
-    const cryptoKey = await window.crypto.subtle.importKey(
+    const subtle = typeof window !== 'undefined' ? window.crypto?.subtle : globalThis.crypto?.subtle;
+    if (!subtle) {
+      return fallbackHmacSha256(keyHex, message);
+    }
+    const cryptoKey = await subtle.importKey(
       'raw',
       keyData,
       { name: 'HMAC', hash: 'SHA-256' },
       false,
       ['sign']
     );
-    const signature = await window.crypto.subtle.sign(
+    const signature = await subtle.sign(
       'HMAC',
       cryptoKey,
       encoder.encode(message)
@@ -33,7 +37,7 @@ export async function computeHmacSha256(keyHex: string, message: string): Promis
     const hashArray = Array.from(new Uint8Array(signature));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   } catch {
-    // Pure JS fallback in case window.crypto is restricted
+    // Pure JS fallback in case subtle is restricted or unavailable
     return fallbackHmacSha256(keyHex, message);
   }
 }

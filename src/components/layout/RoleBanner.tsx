@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { ShieldCheck, HardHat, ShieldAlert, KeyRound } from 'lucide-react';
 import { UserRole } from '../../types';

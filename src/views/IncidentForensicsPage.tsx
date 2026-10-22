@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { AGVRobot, BlackBoxLogEntry, IncidentRecord, IncidentVerificationDetail } from '../types';
 import { IncidentList } from '../components/forensics/IncidentList';

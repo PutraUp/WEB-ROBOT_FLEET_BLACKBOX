@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
-import { ShieldCheck, HardHat, ShieldAlert, Cpu, Terminal, Menu, X } from 'lucide-react';
+import { ShieldCheck, HardHat, ShieldAlert, Cpu, Terminal, Menu, X, Bot, Info } from 'lucide-react';
 import { UserRole } from '../../types';
+import { useRouter, usePathname } from 'next/navigation';
 
 export interface NavbarProps {
   currentRole: UserRole;
@@ -18,22 +21,30 @@ export const Navbar: React.FC<NavbarProps> = ({
   openIncidentsCount
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const navItems = [
-    { id: 'fleet', label: 'Armada AGV', icon: Cpu },
-    { id: 'logs', label: 'Black Box Logs', icon: Terminal },
+    { id: 'fleet', path: '/', label: 'Armada AGV', icon: Cpu },
+    { id: 'katalog', path: '/katalog', label: 'Katalog', icon: Bot },
+    { id: 'logs', path: '/logs', label: 'Black Box Logs', icon: Terminal },
     {
       id: 'forensics',
+      path: '/forensics',
       label: 'Investigasi Forensik',
       icon: ShieldAlert,
       badge: openIncidentsCount > 0 ? openIncidentsCount : undefined
     },
-    { id: 'admin', label: 'Admin & Audit', icon: HardHat, roleRequired: 'ADMIN' }
+    { id: 'admin', path: '/admin', label: 'Admin & Audit', icon: HardHat, roleRequired: 'ADMIN' },
+    { id: 'tentang', path: '/tentang', label: 'Tentang', icon: Info }
   ];
 
-  const handleNavClick = (pageId: string) => {
+  const handleNavClick = (pageId: string, path: string) => {
     onNavigate(pageId);
     setMobileMenuOpen(false);
+    if (router && router.push) {
+      router.push(path);
+    }
   };
 
   return (
@@ -43,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
             <button
-              onClick={() => onNavigate('fleet')}
+              onClick={() => handleNavClick('fleet', '/')}
               className="flex items-center gap-3 text-left focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded-lg p-1"
               aria-label="Kembali ke Beranda Robot Fleet Black Box"
             >
@@ -65,12 +76,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav className="hidden md:flex items-center gap-1" aria-label="Navigasi Utama">
             {navItems.map(item => {
               if (item.roleRequired && currentRole !== 'ADMIN') return null;
-              const isActive = currentPage === item.id;
+              const isActive = currentPage === item.id || pathname === item.path;
               const Icon = item.icon;
               return (
                 <button
                   key={item.id}
-                  onClick={() => handleNavClick(item.id)}
+                  onClick={() => handleNavClick(item.id, item.path)}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
                     isActive
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
@@ -135,12 +146,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex flex-col gap-1">
             {navItems.map(item => {
               if (item.roleRequired && currentRole !== 'ADMIN') return null;
-              const isActive = currentPage === item.id;
+              const isActive = currentPage === item.id || pathname === item.path;
               const Icon = item.icon;
               return (
                 <button
                   key={item.id}
-                  onClick={() => handleNavClick(item.id)}
+                  onClick={() => handleNavClick(item.id, item.path)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'

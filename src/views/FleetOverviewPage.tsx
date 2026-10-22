@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { AGVRobot, RobotCommand } from '../types';
 import { StatCard } from '../components/common/Card';
