@@ -1,6 +1,8 @@
 import 'server-only';
 
-import { AGVRobot, BlackBoxLogEntry, IncidentRecord, AuditLog } from '../types';
+import { AGVRobot, BlackBoxLogEntry, IncidentRecord, AuditLog } from '../types/index';
+import type { MasukanItem } from './skema';
+import type { Item } from './tipe';
 
 /**
  * Kunci rahasia HMAC yang digunakan untuk menandatangani log rantai robot.
@@ -198,4 +200,45 @@ export function getAllRobotIds(): string[] {
  */
 export function getLogsByRobotId(robotId: string): BlackBoxLogEntry[] {
   return LOGS_DATA[robotId] || [];
+}
+
+// ─── Data & Helper Modul 5 (Item Katalog) ───────────────────────────
+export const daftarItem: Item[] = [
+  {
+    id: 1,
+    judul: "Sensor Getaran Turbin",
+    kategori: "energi",
+    deskripsi: "Pemantau vibrasi real-time untuk turbin generator pembangkit listrik.",
+    tersedia: true,
+  },
+  {
+    id: 2,
+    judul: "Pengukur Kualitas Udara Lab",
+    kategori: "lingkungan",
+    deskripsi: "Sensor partikulat PM2.5 dan PM10 untuk keselamatan ruangan praktikum.",
+    tersedia: true,
+  },
+  {
+    id: 3,
+    judul: "Smart Metering Gedung Utama",
+    kategori: "kampus",
+    deskripsi: "Pencatat konsumsi daya listrik per lantai gedung rektorat.",
+    tersedia: false,
+  },
+];
+
+export function judulSudahAda(judul: string) {
+  const dicari = judul.toLowerCase();
+  return daftarItem.some((i) => i.judul.toLowerCase() === dicari);
+}
+
+export function tambahItem(masukan: MasukanItem): Item {
+  const id = Math.max(0, ...daftarItem.map((i) => i.id)) + 1;
+  const item: Item = { id, ...masukan };
+  daftarItem.push(item);
+  return item;
+}
+
+export function cariItem(id: number): Item | undefined {
+  return daftarItem.find((i) => i.id === id);
 }

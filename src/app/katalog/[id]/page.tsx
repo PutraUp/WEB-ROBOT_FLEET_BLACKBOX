@@ -1,7 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getRobotById, getAllRobotIds, getLogsByRobotId } from '../../../lib/data';
-import { Battery, MapPin, Gauge, Package, Clock, Hash, ArrowLeft, Shield, Link as LinkIcon } from 'lucide-react';
+import { getRobotById, getAllRobotIds, getLogsByRobotId, cariItem, daftarItem } from '../../../lib/data';
+import { Battery, MapPin, Gauge, Package, Clock, Hash, ArrowLeft, Shield, CheckCircle, XCircle, Tag } from 'lucide-react';
 import Link from 'next/link';
 
 /**
@@ -10,15 +10,16 @@ import Link from 'next/link';
  * rute dinamis `/katalog/[id]` yang perlu di-render secara statis (SSG).
  */
 export function generateStaticParams() {
-  const ids = getAllRobotIds();
-  return ids.map((id) => ({ id }));
+  const robotIds = getAllRobotIds().map((id) => ({ id }));
+  const itemIds = daftarItem.map((item) => ({ id: String(item.id) }));
+  return [...robotIds, ...itemIds];
 }
 
 /**
- * Halaman Detail Robot — Server Component dengan Dynamic Route.
+ * Halaman Detail Robot & Item — Server Component dengan Dynamic Route.
  *
  * `params` didefinisikan sebagai `Promise` sesuai standar Next.js 15 terbaru.
- * Validasi format ID dilakukan dengan regex sebelum pencarian data.
+ * Mendukung item numerik (Modul 5) dan robot AGV (Modul 4).
  */
 export default async function RobotDetailPage({
   params,
@@ -28,7 +29,94 @@ export default async function RobotDetailPage({
   // Await params (Next.js 15 — params adalah Promise)
   const { id } = await params;
 
-  // Validasi format ID: harus berformat AGV-XX (huruf kapital + angka)
+  // 1. Cek apakah format ID adalah numerik (Item Modul 5)
+  if (/^\d+$/.test(id)) {
+    const item = cariItem(Number(id));
+    if (!item) {
+      notFound();
+    }
+
+    return (
+      <div className="space-y-6 max-w-3xl mx-auto">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <Link href="/katalog" className="hover:text-cyan-400 transition-colors flex items-center gap-1">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Katalog
+          </Link>
+          <span>/</span>
+          <span className="text-white font-semibold">Item #{item.id}: {item.judul}</span>
+        </div>
+
+        {/* Kartu Detail Item */}
+        <div className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+            <div>
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded border border-cyan-800/60">
+                  ID #{item.id}
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-slate-700 bg-slate-800 text-slate-300 capitalize">
+                  <Tag className="w-3 h-3 text-cyan-400" />
+                  {item.kategori}
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {item.judul}
+              </h1>
+            </div>
+
+            <span
+              className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
+                item.tersedia
+                  ? "bg-emerald-950/70 text-emerald-400 border-emerald-700/50"
+                  : "bg-rose-950/70 text-rose-400 border-rose-700/50"
+              }`}
+            >
+              {item.tersedia ? (
+                <>
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  Tersedia di Gudang
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-4 h-4 text-rose-400" />
+                  Tidak Tersedia
+                </>
+              )}
+            </span>
+          </div>
+
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Deskripsi Item
+            </h2>
+            <div className="bg-slate-950/60 p-4 rounded-lg border border-slate-800 text-slate-200 text-sm leading-relaxed">
+              {item.deskripsi}
+            </div>
+          </div>
+
+          <div className="pt-4 flex items-center justify-between">
+            <Link
+              href="/katalog"
+              className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Kembali ke Katalog
+            </Link>
+            <Link
+              href="/katalog/tambah"
+              className="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg transition"
+            >
+              Tambah Item Lain
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Validasi format ID: harus berformat AGV-XX (huruf kapital + angka)
   const idPattern = /^AGV-\d{2,}$/;
   if (!idPattern.test(id)) {
     notFound();

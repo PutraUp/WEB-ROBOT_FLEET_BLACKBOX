@@ -1,6 +1,6 @@
 import React from 'react';
-import { getAllRobots } from '../../lib/data';
-import { Bot, Battery, MapPin, Gauge, Package, ArrowRight } from 'lucide-react';
+import { getAllRobots, daftarItem } from '../../lib/data';
+import { Bot, Battery, MapPin, Gauge, Package, ArrowRight, Plus, Layers } from 'lucide-react';
 import Link from 'next/link';
 
 // ─── Komponen Badge Status (Server Component murni, tanpa state) ─────
@@ -49,14 +49,23 @@ export default function KatalogPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-          <Bot className="w-6 h-6 text-cyan-400" aria-hidden="true" />
-          Katalog Armada Robot AGV
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Registrasi dan spesifikasi teknis seluruh unit robot logistik otonom
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+            <Bot className="w-6 h-6 text-cyan-400" aria-hidden="true" />
+            Katalog Armada Robot AGV & Item
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Registrasi dan spesifikasi teknis seluruh unit robot logistik dan inventaris item
+          </p>
+        </div>
+        <Link
+          href="/katalog/tambah"
+          className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs sm:text-sm px-4 py-2 rounded-lg transition shadow-md shadow-cyan-950/40"
+        >
+          <Plus className="w-4 h-4" />
+          Tambah Item
+        </Link>
       </div>
 
       {/* Ringkasan Statistik (Server-rendered) */}
@@ -167,6 +176,56 @@ export default function KatalogPage() {
                 <span className="text-xs text-slate-400">Total Log: <strong className="text-white">{robot.totalLogsCount}</strong> entri</span>
                 <span className="text-xs text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                   Lihat Detail <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Bagian Daftar Item (Modul 5) */}
+      <div className="pt-4 border-t border-slate-800">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <Layers className="w-4 h-4 text-cyan-400" />
+            Daftar Inventaris Item ({daftarItem.length} Item)
+          </h2>
+          <span className="text-xs text-slate-400">
+            Hasil penambahan data dari formulir terverifikasi Modul 5
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {daftarItem.map((item) => (
+            <Link
+              key={item.id}
+              href={`/katalog/${item.id}`}
+              className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 hover:border-cyan-500/50 hover:shadow-md transition block group"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/60">
+                  Item #{item.id}
+                </span>
+                <span
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    item.tersedia
+                      ? "bg-emerald-950/70 text-emerald-400 border border-emerald-700/50"
+                      : "bg-slate-800 text-slate-400 border border-slate-700"
+                  }`}
+                >
+                  {item.tersedia ? "Tersedia" : "Tidak Tersedia"}
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">
+                {item.judul}
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                {item.deskripsi}
+              </p>
+              <div className="mt-3 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-500">
+                <span className="capitalize text-slate-400">Kategori: {item.kategori}</span>
+                <span className="text-cyan-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  Detail <ArrowRight className="w-3 h-3" />
                 </span>
               </div>
             </Link>
