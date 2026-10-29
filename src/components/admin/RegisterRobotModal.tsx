@@ -5,6 +5,7 @@ import { FormField, Input, Select } from '../common/FormField';
 import { Button } from '../common/Button';
 import { Bot } from 'lucide-react';
 import { ROBOT_HMAC_SECRET_KEY } from '../../data/mockData';
+import { createRobotSchema } from '../../lib/validations/robot';
 
 export interface RegisterRobotModalProps {
   isOpen: boolean;
@@ -29,36 +30,30 @@ export const RegisterRobotModal: React.FC<RegisterRobotModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = (): boolean => {
-    const errs: Record<string, string> = {};
+    const schema = createRobotSchema(existingIds);
+    const result = schema.safeParse({
+      robotId,
+      name,
+      model,
+      zone,
+      payloadCapacity,
+      hmacKey
+    });
 
-    const cleanId = robotId.trim().toUpperCase();
-    if (!cleanId) {
-      errs.robotId = 'ID Robot wajib diisi.';
-    } else if (!/^AGV-\d{2,}$/.test(cleanId)) {
-      errs.robotId = 'Format ID Robot harus berformat AGV-XX (contoh: AGV-05).';
-    } else if (existingIds.includes(cleanId)) {
-      errs.robotId = `ID Robot ${cleanId} sudah terdaftar dalam sistem.`;
+    if (!result.success) {
+      const errs: Record<string, string> = {};
+      result.error.issues.forEach(issue => {
+        const fieldName = issue.path[0] as string;
+        if (!errs[fieldName]) {
+          errs[fieldName] = issue.message;
+        }
+      });
+      setErrors(errs);
+      return false;
     }
 
-    if (!name.trim()) {
-      errs.name = 'Nama unit AGV wajib diisi.';
-    } else if (name.trim().length < 3) {
-      errs.name = 'Nama unit minimal 3 karakter.';
-    }
-
-    const cap = parseFloat(payloadCapacity);
-    if (isNaN(cap) || cap <= 0) {
-      errs.payloadCapacity = 'Kapasitas muatan harus berupa angka positif (kg).';
-    }
-
-    if (!hmacKey.trim()) {
-      errs.hmacKey = 'Kunci rahasia HMAC wajib disediakan untuk pengamanan log.';
-    } else if (hmacKey.trim().length < 16) {
-      errs.hmacKey = 'Kunci HMAC minimal harus memiliki 16 karakter keamanan kriptografi.';
-    }
-
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = (e: React.FormEvent) => {

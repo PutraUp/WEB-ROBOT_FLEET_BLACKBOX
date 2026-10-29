@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { ShieldCheck, HardHat, ShieldAlert, Cpu, Terminal, Menu, X, Bot, Info } from 'lucide-react';
+import { ShieldCheck, HardHat, ShieldAlert, Cpu, Terminal, Menu, X, Bot, Info, LogIn, LogOut, UserCheck } from 'lucide-react';
 import { UserRole } from '../../types';
 import { useRouter, usePathname } from 'next/navigation';
+import { useFleet } from '../../context/FleetContext';
 
 export interface NavbarProps {
   currentRole: UserRole;
@@ -23,6 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { authUser, logoutUser } = useFleet();
 
   const navItems = [
     { id: 'fleet', path: '/', label: 'Armada AGV', icon: Cpu },
@@ -35,8 +37,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       icon: ShieldAlert,
       badge: openIncidentsCount > 0 ? openIncidentsCount : undefined
     },
+    { id: 'aead', path: '/aead', label: 'AEAD Kripto (Tugas 2)', icon: ShieldCheck },
     { id: 'admin', path: '/admin', label: 'Admin & Audit', icon: HardHat, roleRequired: 'ADMIN' },
-    { id: 'tentang', path: '/tentang', label: 'Tentang', icon: Info }
+    { id: 'tentang', path: '/tentang', label: 'Tentang', icon: Info },
+    { id: 'login', path: '/login', label: 'Login (Zod)', icon: LogIn }
   ];
 
   const handleNavClick = (pageId: string, path: string) => {
@@ -101,8 +105,38 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Role Switcher & Controls */}
+          {/* User Auth Status & Role Switcher */}
           <div className="hidden lg:flex items-center gap-3">
+            {authUser ? (
+              <div className="flex items-center gap-2 bg-slate-900/90 border border-emerald-500/30 rounded-lg px-2.5 py-1.5 shadow-sm">
+                <UserCheck className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-white leading-tight">{authUser.name}</span>
+                  <span className="text-[10px] text-emerald-400 font-mono leading-tight">
+                    {authUser.role} ({authUser.email})
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={logoutUser}
+                  title="Keluar / Logout"
+                  className="ml-1 text-slate-400 hover:text-red-400 p-1 rounded hover:bg-slate-800 transition-colors"
+                  aria-label="Logout"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleNavClick('login', '/login')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-600/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-600/30 transition-colors"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Masuk (Zod)</span>
+              </button>
+            )}
+
             <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg p-1">
               <label htmlFor="role-select" className="text-[11px] font-semibold text-slate-400 uppercase px-2">
                 Peran:
@@ -173,7 +207,38 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </div>
 
+          {/* Mobile Auth Status */}
           <div className="pt-3 border-t border-slate-800">
+            {authUser ? (
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900 border border-emerald-500/30 mb-2">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-emerald-400" />
+                  <div>
+                    <span className="block text-xs font-bold text-white">{authUser.name}</span>
+                    <span className="block text-[10px] text-emerald-400 font-mono">
+                      {authUser.role} ({authUser.email})
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={logoutUser}
+                  className="text-xs font-semibold text-red-400 hover:text-red-300 px-2 py-1 rounded bg-red-950/30 border border-red-500/30"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleNavClick('login', '/login')}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 mb-2"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Masuk ke Akun (Zod Form)</span>
+              </button>
+            )}
+
             <label htmlFor="mobile-role-select" className="text-xs font-semibold text-slate-400 block mb-1">
               Beralih Peran Pengguna (RBAC):
             </label>

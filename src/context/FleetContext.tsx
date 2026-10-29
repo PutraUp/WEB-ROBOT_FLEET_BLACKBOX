@@ -17,7 +17,17 @@ import {
   INITIAL_AUDIT_LOGS
 } from '../data/mockData';
 
+export interface AuthUser {
+  email: string;
+  name: string;
+  role: UserRole;
+  loginTime: string;
+}
+
 export interface FleetContextType {
+  authUser: AuthUser | null;
+  loginUser: (user: AuthUser) => void;
+  logoutUser: () => void;
   currentRole: UserRole;
   setCurrentRole: (role: UserRole) => void;
   currentPage: string;
@@ -49,8 +59,22 @@ export interface FleetContextType {
 const FleetContext = createContext<FleetContextType | undefined>(undefined);
 
 export const FleetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [currentRole, setCurrentRole] = useState<UserRole>('OPERATOR');
   const [currentPage, setCurrentPage] = useState<string>('fleet');
+
+  const loginUser = (user: AuthUser) => {
+    setAuthUser(user);
+    setCurrentRole(user.role);
+    recordAudit('USER_LOGIN', `Autentikasi sesi berhasil untuk ${user.email} (${user.role})`);
+  };
+
+  const logoutUser = () => {
+    const prevEmail = authUser?.email || 'user';
+    setAuthUser(null);
+    setCurrentRole('OPERATOR');
+    recordAudit('USER_LOGOUT', `Sesi diakhiri untuk ${prevEmail}`);
+  };
 
   // Application Global Mock States
   const [robots, setRobots] = useState<AGVRobot[]>(INITIAL_ROBOTS);
@@ -207,6 +231,9 @@ export const FleetProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <FleetContext.Provider
       value={{
+        authUser,
+        loginUser,
+        logoutUser,
         currentRole,
         setCurrentRole,
         currentPage,

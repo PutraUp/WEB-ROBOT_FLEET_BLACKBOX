@@ -35,6 +35,10 @@ export const AppShell: React.FC<{ children: ReactNode }> = ({ children }) => {
       setCurrentPage('katalog');
     } else if (pathname === '/tentang') {
       setCurrentPage('tentang');
+    } else if (pathname === '/login') {
+      setCurrentPage('login');
+    } else if (pathname === '/aead') {
+      setCurrentPage('aead');
     } else if (pathname === '/') {
       setCurrentPage('fleet');
     }

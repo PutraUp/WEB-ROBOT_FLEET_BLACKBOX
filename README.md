@@ -161,8 +161,27 @@ Pengujian aksesibilitas (*Web Accessibility Audit*) dilakukan langsung pada ling
    npm run lint
    ```
 
-4. **Kompilasi Versi Produksi (Build):**
+4. **Eksekusi Test Suite Kriptografi AEAD (Tugas 2):**
+   ```bash
+   npm test
+   # atau
+   npm run test:crypto
+   ```
+
+5. **Kompilasi Versi Produksi (Build):**
    ```bash
    npm run build
    npm run start
    ```
+
+---
+
+## 🔐 7. Modul Kriptografi Tugas 2 (AEAD AES-256-GCM)
+
+Aplikasi ini mengintegrasikan penugasan **Tugas 2 Kriptografi & Keamanan Siber (Sub-CPMK 3, Git Tag `v0.2`)**:
+* **Dokumen Arsitektur & Analisis:** Lihat [KEPUTUSAN.md](KEPUTUSAN.md) (Format Kebutuhan $\to$ Mekanisme $\to$ Alasan).
+* **Catatan AI & Integritas Akademik:** Lihat [AI_LOG.md](AI_LOG.md).
+* **Standar Implementasi:** NIST SP 800-38D (AES-256-GCM dengan Nonce 96-bit CSPRNG, Tag 128-bit, AAD).
+* **Prinsip Keamanan:** Gagal Tertutup (*Fail-Closed*), kunci simetris disimpan di luar git (`.env.local`), masukan divalidasi ketat.
+* **Halaman Demo Interaktif:** Buka rute `/aead` pada aplikasi untuk mencoba enkripsi, tamper simulator, dan live test suite.
+
