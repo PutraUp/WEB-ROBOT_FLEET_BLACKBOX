@@ -1,0 +1,25 @@
+2026-10-30T09:15:20.124Z	INFO	Vulnerability scanning is enabled
+2026-10-30T09:15:20.125Z	INFO	Detected OS: debian (bookworm 12.5)
+2026-10-30T09:15:20.125Z	INFO	Detecting Debian vulnerabilities...
+2026-10-30T09:15:20.312Z	INFO	Number of language-specific files: 1
+2026-10-30T09:15:20.312Z	INFO	Detecting node-pkg vulnerabilities...
+
+Target: robot-fleet-app:before-hardening (node:20-bookworm)
+===========================================================
+Total: 38 (CRITICAL: 3, HIGH: 9, MEDIUM: 18, LOW: 8)
+
+┌────────────────┬────────────────┬──────────┬──────────────┬────────────────────────┬────────────────────────────────────────────────────────┐
+│    Library     │ Vulnerability  │ Severity │ Installed    │      Fixed Version     │                         Title                          │
+├────────────────┼────────────────┼──────────┼──────────────┼────────────────────────┼────────────────────────────────────────────────────────┤
+│ curl           │ CVE-2023-38545 │ CRITICAL │ 7.88.1-10    │ 7.88.1-10+deb12u4      │ curl: SOCKS5 heap buffer overflow                      │
+│ libnghttp2-14  │ CVE-2023-44487 │ CRITICAL │ 1.52.0-1     │ 1.52.0-1+deb12u1       │ HTTP/2: Rapid Reset Attack Denial of Service           │
+│ nodejs         │ CVE-2024-21892 │ CRITICAL │ 20.9.0-1     │ 20.11.1-1              │ Node.js: Code execution via path traversal in loader   │
+│ git            │ CVE-2024-32002 │ HIGH     │ 1:2.39.2-1.1 │ 1:2.39.5-0+deb12u1     │ Git: RCE when cloning repositories with submodules     │
+│ libssl3        │ CVE-2023-5678  │ HIGH     │ 3.0.11-1     │ 3.0.13-1~deb12u1       │ OpenSSL: Generating excessively long primes in DH      │
+│ openssl        │ CVE-2024-0727  │ HIGH     │ 3.0.11-1     │ 3.0.13-1~deb12u1       │ OpenSSL: Null pointer dereference in PKCS12 parsing    │
+│ tar            │ CVE-2023-39804 │ HIGH     │ 1.34+dfsg-1  │ 1.34+dfsg-1.2          │ tar: Directory traversal vulnerability                 │
+│ zlib1g         │ CVE-2023-45853 │ HIGH     │ 1:1.2.13.dfsg│ 1:1.2.13.dfsg-1        │ MiniZip in zlib: Integer overflow in zipOpenNewFile    │
+└────────────────┴────────────────┴──────────┴──────────────┴────────────────────────┴────────────────────────────────────────────────────────┘
+
+Status: ❌ GAGAL STANDAR KEAMANAN (Ditemukan 3 kerentanan tingkat CRITICAL).
+Image tidak layak didistribusikan ke lingkungan produksi.

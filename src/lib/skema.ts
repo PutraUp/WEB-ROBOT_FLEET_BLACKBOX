@@ -23,3 +23,4 @@ export const skemaMasuk = z.object({
   email: z.email("Format email tidak valid"),
   kataSandi: z.string().min(8, "Kata sandi minimal 8 karakter"),
 });
+

@@ -53,3 +53,4 @@ export async function simpanItem(
   revalidatePath("/katalog");
   redirect(`/katalog/${id}`); // 5. di luar try
 }
+

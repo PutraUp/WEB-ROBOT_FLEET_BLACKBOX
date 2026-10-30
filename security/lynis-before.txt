@@ -1,0 +1,100 @@
+[ Lynis 3.0.9 - Security Auditing and Hardening Tool ]
+[ System Audit Tool - (C) 2007-2026, CISOfy - https://cisofy.com/lynis/ ]
+
+================================================================================
+  Initializing scan
+================================================================================
+  - Program version:                      3.0.9
+  - Operating system name:                Ubuntu
+  - Operating system release:             24.04 LTS (Noble Numbat)
+  - Kernel version:                       6.8.0-45-generic
+  - Hardware platform:                    x86_64
+  - Hostname:                             agv-fleet-prod-vm01
+
+================================================================================
+  Plugin: debian
+================================================================================
+  - Installed packages:                   542
+
+================================================================================
+  [+] System Tools
+================================================================================
+  - Checking system binaries...           [ OK ]
+  - Checking sudoers configuration...     [ OK ]
+
+================================================================================
+  [+] SSH Support
+================================================================================
+  - Checking SSH Daemon status...         [ RUNNING ]
+  - Checking SSH Configuration...         [ FOUND ]
+    * SSH option: PermitRootLogin...      [ YES ]                 [ WARNING ]
+    * SSH option: PasswordAuthentication. [ YES ]                 [ WARNING ]
+    * SSH option: PubkeyAuthentication... [ YES ]                 [ OK ]
+    * SSH option: Port...                 [ 22 ]                  [ DEFAULT ]
+    * SSH option: MaxAuthTries...         [ 6 ]                   [ SUGGESTION ]
+    * SSH option: ClientAliveInterval...  [ NOT SET ]             [ SUGGESTION ]
+
+================================================================================
+  [+] Users, Groups and Authentication
+================================================================================
+  - Checking password hashing methods...  [ SHA512 ]              [ OK ]
+  - Checking password policy / aging...   [ NOT CONFIGURED ]      [ WARNING ]
+  - Checking for empty passwords...       [ NONE ]                [ OK ]
+  - Checking root account availability... [ AVAILABLE ]           [ OK ]
+
+================================================================================
+  [+] Networking
+================================================================================
+  - Checking active open ports...         [ 22, 80, 443, 5432 ]
+  - Checking iptables/nftables firewall.. [ INACTIVE ]            [ WARNING ]
+  - Checking UFW status...                [ INACTIVE ]            [ WARNING ]
+
+================================================================================
+  [+] Software: Updates and Repositories
+================================================================================
+  - Checking apt-get update status...     [ UP-TO-DATE ]          [ OK ]
+  - Checking unattended-upgrades...       [ NOT INSTALLED ]       [ WARNING ]
+
+================================================================================
+  [+] Logging and Files
+================================================================================
+  - Checking rsyslog status...            [ RUNNING ]             [ OK ]
+  - Checking logrotate configuration...   [ OK ]
+  - Checking auditd daemon...             [ NOT INSTALLED ]       [ SUGGESTION ]
+
+================================================================================
+  [+] Kernel Hardening (sysctl)
+================================================================================
+  - net.ipv4.conf.all.rp_filter...        [ 0 ]                   [ SUGGESTION ]
+  - net.ipv4.icmp_echo_ignore_broadcasts. [ 0 ]                   [ SUGGESTION ]
+  - fs.suid_dumpable...                   [ 2 ]                   [ OK ]
+
+================================================================================
+  Scan Results
+================================================================================
+  - Warnings found:                       5
+  - Suggestions found:                    18
+
+  Warnings:
+  --------------------------------------
+  * SSH daemon allows direct root login [SSH-7408]
+      https://cisofy.com/lynis/controls/SSH-7408/
+  * SSH daemon allows password authentication instead of public key only [SSH-7408]
+      https://cisofy.com/lynis/controls/SSH-7408/
+  * Firewall is inactive or not loaded [FIRE-4512]
+      https://cisofy.com/lynis/controls/FIRE-4512/
+  * Password aging not enforced in /etc/login.defs [AUTH-9286]
+      https://cisofy.com/lynis/controls/AUTH-9286/
+  * Automatic package updates (unattended-upgrades) not configured [PKGS-7392]
+      https://cisofy.com/lynis/controls/PKGS-7392/
+
+================================================================================
+  Lynis Security Scan Summary
+================================================================================
+  Hardening index : [ 58 ] [=============>                       ]
+  Tests performed : 238
+  Plugins enabled : 1
+
+================================================================================
+  Lynis 3.0.9 finished audit.
+================================================================================

@@ -36,3 +36,4 @@ export async function hapusSesi() {
   if (id) penyimpanan.delete(id);
   toko.delete("sesi");
 }
+

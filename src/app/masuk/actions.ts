@@ -30,3 +30,4 @@ export async function keluar() {
   await hapusSesi();
   redirect("/");
 }
+

@@ -1,0 +1,73 @@
+version: '3.8'
+
+# ==============================================================================
+# Hardened Docker Compose - Robot Fleet Black Box (Tugas 2)
+# Kontrol: Non-root user, Capability Drop, Port DB & App Tidak Dipublikasikan
+# ==============================================================================
+
+services:
+  # ─── Service Database (PostgreSQL) ──────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: fleet-postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fleet_blackbox_db
+      POSTGRES_USER: fleet_app_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    # KONTROL HARDENING 1: Port database TIDAK dipublikasikan ke host/internet!
+    # Hanya menggunakan 'expose' agar eksklusif diakses internal oleh container 'app'
+    expose:
+      - "5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./security/secrets/db_password.txt:/run/secrets/db_password:ro
+    networks:
+      - internal-fleet-net
+    # KONTROL HARDENING 2: Pembatasan Linux Capabilities & No New Privileges
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - FOWNER
+
+  # ─── Service Web Application (Next.js) ──────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fleet-web-app
+    restart: unless-stopped
+    user: "1001:1001" # KONTROL HARDENING 3: Menjalankan container sebagai pengguna non-root
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://fleet_app_user:password_rahasia_internal@db:5432/fleet_blackbox_db
+    # KONTROL HARDENING 4: Port aplikasi tidak dipublikasikan ke publik 0.0.0.0
+    # Hanya terikat ke loopback lokal 127.0.0.1 untuk reverse proxy (Nginx/Cloudflare Tunnel)
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - db
+    networks:
+      - internal-fleet-net
+    # KONTROL HARDENING 5: Menghapus seluruh Linux Capabilities
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: false
+    tmpfs:
+      - /tmp
+
+networks:
+  internal-fleet-net:
+    driver: bridge
+    internal: false # Mengizinkan outbound jika diperlukan, namun ingress terisolasi
+
+volumes:
+  pgdata:
+    driver: local

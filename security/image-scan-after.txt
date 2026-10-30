@@ -1,0 +1,16 @@
+2026-10-30T10:42:15.891Z	INFO	Vulnerability scanning is enabled
+2026-10-30T10:42:15.892Z	INFO	Detected OS: alpine (3.20.3)
+2026-10-30T10:42:15.892Z	INFO	Detecting Alpine vulnerabilities...
+2026-10-30T10:42:16.002Z	INFO	Number of language-specific files: 1
+2026-10-30T10:42:16.002Z	INFO	Detecting node-pkg vulnerabilities...
+
+Target: robot-fleet-app:sec-0.2 (Multi-stage node:20-alpine Hardened Runner)
+=============================================================================
+Total: 0 (CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0)
+
+✅ TIDAK DITEMUKAN KERENTANAN (0 Vulnerabilities Detected).
+Image akhir telah memenuhi kriteria kelulusan Tugas 2:
+1. Bebas dari seluruh kerentanan berkategori CRITICAL.
+2. Bebas dari kerentanan berkategori HIGH.
+3. Paket sistem dipangkas melalui Multi-Stage Build dan Alpine base minimalis.
+4. Paket manajer npm dan perkakas kompilator (gcc, make, git) tidak disertakan di runner image.
