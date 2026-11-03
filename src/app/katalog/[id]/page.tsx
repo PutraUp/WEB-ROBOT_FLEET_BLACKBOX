@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getRobotById, getAllRobotIds, getLogsByRobotId, cariItem, daftarItem } from '../../../lib/data';
+import { getRobotById, getAllRobotIds, getLogsByRobotId, cariItem, cariItemAsync, daftarItem } from '../../../lib/data';
 import { Battery, MapPin, Gauge, Package, Clock, Hash, ArrowLeft, Shield, CheckCircle, XCircle, Tag } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,7 +31,7 @@ export default async function RobotDetailPage({
 
   // 1. Cek apakah format ID adalah numerik (Item Modul 5)
   if (/^\d+$/.test(id)) {
-    const item = cariItem(Number(id));
+    const item = await cariItemAsync(Number(id));
     if (!item) {
       notFound();
     }

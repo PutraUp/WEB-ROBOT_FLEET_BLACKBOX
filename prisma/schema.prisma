@@ -1,0 +1,91 @@
+// Prisma Schema untuk Robot Fleet Black Box & Inventory
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── 1. Model Item Katalog (Modul 5) ───────────────────────────
+model Item {
+  id        Int      @id @default(autoincrement())
+  judul     String   @unique
+  kategori  String   // energi | lingkungan | kampus
+  deskripsi String   @db.Text
+  tersedia  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("items")
+}
+
+// ─── 2. Model Armada Robot AGV (Modul 4 & 6) ───────────────────
+model Robot {
+  id             String        @id // contoh: "AGV-01"
+  name           String
+  model          String
+  status         String        @default("IDLE") // ACTIVE, ALERT, CHARGING, IDLE, ONLINE, OFFLINE
+  battery        Int           @default(100)
+  zone           String
+  speed          Float         @default(0.0)
+  lastPing       DateTime      @default(now())
+  hmacKey        String        @unique // Kunci simetris unik per unit robot
+  currentTask    String        @default("Menunggu Penugasan")
+  payloadWeight  Float         @default(0.0)
+  checkpointHead String?       // MAC entri terakhir
+  totalLogsCount Int           @default(0)
+  logs           BlackBoxLog[] // Relasi 1:N ke log rantai hash
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("robots")
+}
+
+// ─── 3. Model Log Rantai Forensik Kriptografi (Modul 6) ────────
+model BlackBoxLog {
+  id        Int      @id @default(autoincrement())
+  robotId   String   @map("robot_id")
+  robot     Robot    @relation(fields: [robotId], references: [id], onDelete: Restrict)
+  seq       Int      // Nomor urut sekuensial (1, 2, 3...)
+  ts        DateTime @default(now())
+  prevMac   String   @map("prev_mac") // Hash entri sebelumnya
+  payload   Json     // Telemetri: {x, y, speed, battery, status, sensorAlert, ...}
+  mac       String   @unique // HMAC-SHA256 digest unik
+  createdAt DateTime @default(now())
+
+  @@unique([robotId, seq]) // Setiap robot tidak boleh memiliki nomor sekuens ganda
+  @@map("black_box_logs")
+}
+
+// ─── 4. Model Rekaman Insiden Forensik ─────────────────────────
+model IncidentRecord {
+  id               String   @id @default(uuid())
+  robotId          String   @map("robot_id")
+  title            String
+  description      String   @db.Text
+  severity         String   // LOW, MEDIUM, HIGH, CRITICAL
+  anomalyType      String   // COLLISION, SENSOR_TAMPERING, etc.
+  status           String   @default("OPEN") // OPEN, INVESTIGATING, RESOLVED, TAMPER_DETECTED
+  investigatorName String   @default("Sistem Otomatis")
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("incident_records")
+}
+
+// ─── 5. Model Jejak Audit Sistem (Audit Trail) ──────────────────
+model AuditLog {
+  id        String   @id @default(uuid())
+  user      String
+  role      String   // OPERATOR, FORENSIC, ADMIN
+  action    String
+  target    String
+  status    String   @default("SUCCESS") // SUCCESS, WARNING, FAILED
+  timestamp DateTime @default(now())
+
+  @@map("audit_logs")
+}

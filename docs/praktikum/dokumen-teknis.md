@@ -213,3 +213,4 @@ Seluruh pengujian unit, kompilasi TypeScript, dan linter berhasil diselesaikan t
 * **Perintah Utama**: Menyusun Dokumen Teknis Modul 5 secara lengkap berdasarkan tangkapan layar praktikum, mengekstraksi berkas gambar hasil uji, dan memetakan hasil pengujian ke rubrik penilaian.
 * **Bagian yang Dibantu**: Penyusunan kerangka dokumen Markdown, ekstraksi gambar dari dokumen tangkapan layar, pembuatan tabel skenario pengujian 11 kasus uji, serta perumusan narasi analisis keamanan session dan cookie.
 * **Cara Verifikasi**: Menjalankan seluruh pengujian unit otomatis di terminal (`npm run test:modul05`), memeriksa kesesuaian gambar bukti uji terhadap form dan header aplikasi, serta mengonfirmasi kelulusan build produksi (`npm run build`).
+

@@ -2,7 +2,8 @@ import 'server-only';
 
 import { AGVRobot, BlackBoxLogEntry, IncidentRecord, AuditLog } from '../types/index';
 import type { MasukanItem } from './skema';
-import type { Item } from './tipe';
+import type { Item, Kategori } from './tipe';
+import { prisma } from './prisma';
 
 /**
  * Kunci rahasia HMAC yang digunakan untuk menandatangani log rantai robot.
@@ -241,4 +242,47 @@ export function tambahItem(masukan: MasukanItem): Item {
 
 export function cariItem(id: number): Item | undefined {
   return daftarItem.find((i) => i.id === id);
+}
+
+/**
+ * Mengambil daftar item dari database PostgreSQL melalui Prisma ORM.
+ * Jika koneksi database belum tersedia, menggunakan fallback larik memori.
+ */
+export async function ambilDaftarItem(): Promise<Item[]> {
+  try {
+    const itemsDb = await prisma.item.findMany({ orderBy: { id: "asc" } });
+    if (itemsDb && itemsDb.length > 0) {
+      return itemsDb.map((item) => ({
+        id: item.id,
+        judul: item.judul,
+        kategori: item.kategori as Kategori,
+        deskripsi: item.deskripsi,
+        tersedia: item.tersedia,
+      }));
+    }
+  } catch {
+    // Toleransi jika server database belum aktif
+  }
+  return daftarItem;
+}
+
+/**
+ * Mengambil detail item berdasarkan ID dari database PostgreSQL melalui Prisma ORM.
+ */
+export async function cariItemAsync(id: number): Promise<Item | undefined> {
+  try {
+    const itemDb = await prisma.item.findUnique({ where: { id } });
+    if (itemDb) {
+      return {
+        id: itemDb.id,
+        judul: itemDb.judul,
+        kategori: itemDb.kategori as Kategori,
+        deskripsi: itemDb.deskripsi,
+        tersedia: itemDb.tersedia,
+      };
+    }
+  } catch {
+    // Toleransi jika server database belum aktif
+  }
+  return cariItem(id);
 }

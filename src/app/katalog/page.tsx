@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAllRobots, daftarItem } from '../../lib/data';
+import { getAllRobots, ambilDaftarItem } from '../../lib/data';
 import { Bot, Battery, MapPin, Gauge, Package, ArrowRight, Plus, Layers } from 'lucide-react';
 import Link from 'next/link';
 
@@ -35,9 +35,10 @@ function StatusBadge({ status }: { status: string }) {
  * oleh `import "server-only"`, sehingga kunci HMAC tidak pernah masuk
  * ke bundle JavaScript klien.
  */
-export default function KatalogPage() {
+export default async function KatalogPage() {
   // Akses data di sisi server — fungsi ini hanya berjalan di server
   const robots = getAllRobots();
+  const items = await ambilDaftarItem();
 
   const totalRobots = robots.length;
   const activeRobots = robots.filter(r => r.status === 'ACTIVE').length;
@@ -188,15 +189,15 @@ export default function KatalogPage() {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
             <Layers className="w-4 h-4 text-cyan-400" />
-            Daftar Inventaris Item ({daftarItem.length} Item)
+            Daftar Inventaris Item ({items.length} Item)
           </h2>
           <span className="text-xs text-slate-400">
-            Hasil penambahan data dari formulir terverifikasi Modul 5
+            Hasil penambahan data dari formulir terverifikasi Modul 5 & Basis Data PostgreSQL
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {daftarItem.map((item) => (
+          {items.map((item) => (
             <Link
               key={item.id}
               href={`/katalog/${item.id}`}
