@@ -19,7 +19,8 @@ function createPrismaClient(): PrismaClient {
   const adapter = new PrismaPg({ connectionString });
   return new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    // Modul 7: tampilkan query SQL, warning, dan error di terminal development
+    log: ['query', 'warn', 'error'],
   });
 }
 
